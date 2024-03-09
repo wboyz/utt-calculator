@@ -45,6 +45,20 @@ const formattedTimes = Array.from({ length: 60 * 10 }, (_, i) => {
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
 });
 
+function calculateDuration(time1: string, time2: string) {
+  const [hours1, minutes1] = time1.split(':').map(Number);
+  const [hours2, minutes2] = time2.split(':').map(Number);
+
+  const totalMinutes1 = hours1 * 60 + minutes1;
+  const totalMinutes2 = hours2 * 60 + minutes2;
+
+  const diffMinutes = Math.abs(totalMinutes1 - totalMinutes2);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffMinutesRemainder = diffMinutes % 60;
+
+  return `${diffHours.toString().padStart(2, '0')}:${diffMinutesRemainder.toString().padStart(2, '0')}`;
+}
+
 </script>
 
 <template>
@@ -57,38 +71,42 @@ const formattedTimes = Array.from({ length: 60 * 10 }, (_, i) => {
     </div>
   </div>
 
-  <div class="flex">
-    <div class="flex flex-col">
-      <div v-for="(section, index) in sections" :key="section.id" class="flex gap-3 h-8"
-        :class="section.id % 2 === 0 ? 'bg-gray-200' : ''">
-        <div class="items-center text-lg font-bold w-8">{{ section.id }}.</div>
-        <div class="items-center text-lg w-64">{{ section.from }}</div>
-        <div class="items-center text-gray-500 w-64">{{ section.to }}</div>
-        <div class="items-center text-gray-500 w-20 font-bold">{{ section.distance }} km</div>
-        <div class="items-center flex w-32">
-          <select v-model="selectedRunners[index]">
-            <option v-for="runner in runners" :key="runner.name" :value="runner">{{ runner.name }}</option>
-          </select>
-        </div>
-        <div class="items-center flex w-14">
-          <input type="number" v-if="selectedRunners[index]" v-model="selectedRunners[index].pace" class="w-14" />
-        </div>
-        <div class="items-center flex w-14">
-          {{ selectedRunners[index]?.formattedTime(sections[index].distance) }}
-        </div>
+  <div class="flex flex-col">
+    <div v-for="(section, index) in sections" :key="section.id" class="flex gap-3 h-8"
+      :class="section.id % 2 === 0 ? 'bg-gray-200' : ''">
+      <div class="items-center text-lg font-bold w-8">{{ section.id }}.</div>
+      <div class="items-center text-lg w-64">{{ section.from }}</div>
+      <div class="items-center text-gray-500 w-64">{{ section.to }}</div>
+      <div class="items-center text-gray-500 w-20 font-bold">{{ section.distance }} km</div>
+      <div class="items-center flex w-32">
+        <select v-model="selectedRunners[index]">
+          <option v-for="runner in runners" :key="runner.name" :value="runner">{{ runner.name }}</option>
+        </select>
       </div>
-    </div>
-    <div class="flex flex-col">
-      <div class="flex w-14 h-8 px-2 font-bold items-center" v-for="(section, index) in sections" :key="section.id">
-        <div v-if="selectedRunners[index]">
-          <div v-if="index === 0">
+      <div class="items-center flex w-14">
+        <input type="number" v-if="selectedRunners[index]" v-model="selectedRunners[index].pace" class="w-14" />
+      </div>
+      <div class="items-center flex w-14">
+        {{ selectedRunners[index]?.formattedTime(sections[index].distance) }}
+      </div>
+      <div v-if="selectedRunners[index]" class="flex items-center">
+        <div v-if="index === 0">
           {{ sections[0].calculateArrival(startingTime, selectedRunners[0]?.formattedTime(sections[0].distance)) }}
         </div>
         <div v-else>
-          {{ sections[index].calculateArrival(sections[index - 1]?.arrival, selectedRunners[index]?.formattedTime(sections[index].distance)) }}
-        </div>
+          {{ sections[index].calculateArrival(sections[index - 1]?.arrival,
+      selectedRunners[index]?.formattedTime(sections[index].distance)) }}
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="flex">
+    <div class="text-lg font-bold w-32">
+      Összesen
+    </div>
+    <div class="text-lg font-bold w-32">
+      {{ calculateDuration(sections[sections.length - 1].arrival, startingTime) }} 
     </div>
   </div>
 
