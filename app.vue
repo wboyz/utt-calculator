@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
 import { Runner } from './models/runner';
 import { Section } from './models/section';
+
+dayjs.extend(duration);
 
 const selectedRunners = ref<Runner[]>([]);
 const startingTime = ref('05:00');
@@ -40,23 +44,16 @@ const runners: Runner[] = [
 ];
 
 const formattedTimes = Array.from({ length: 60 * 10 }, (_, i) => {
-  const hours = Math.floor(i / 60) + 5;
-  const minutes = i % 60;
-  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+  const time = dayjs.duration(i, 'minutes').add(5, 'hours');
+  return time.format('HH:mm');
 });
 
-function calculateDuration(time1: string, time2: string) {
-  const [hours1, minutes1] = time1.split(':').map(Number);
-  const [hours2, minutes2] = time2.split(':').map(Number);
+function calculateDuration(time1: string = '00:00', time2: string = '00:00') {
+  const duration1 = dayjs.duration(time1);
+  const duration2 = dayjs.duration(time2);
+  const diffDuration = duration1.subtract(duration2);
 
-  const totalMinutes1 = hours1 * 60 + minutes1;
-  const totalMinutes2 = hours2 * 60 + minutes2;
-
-  const diffMinutes = Math.abs(totalMinutes1 - totalMinutes2);
-  const diffHours = Math.floor(diffMinutes / 60);
-  const diffMinutesRemainder = diffMinutes % 60;
-
-  return `${diffHours.toString().padStart(2, '0')}:${diffMinutesRemainder.toString().padStart(2, '0')}`;
+  return diffDuration.format('HH:mm');
 }
 
 </script>
@@ -94,8 +91,7 @@ function calculateDuration(time1: string, time2: string) {
           {{ sections[0].calculateArrival(startingTime, selectedRunners[0]?.formattedTime(sections[0].distance)) }}
         </div>
         <div v-else>
-          {{ sections[index].calculateArrival(sections[index - 1]?.arrival,
-      selectedRunners[index]?.formattedTime(sections[index].distance)) }}
+          {{ sections[index].calculateArrival(sections[index - 1]?.arrival, selectedRunners[index]?.formattedTime(sections[index].distance)) }}
         </div>
       </div>
     </div>
