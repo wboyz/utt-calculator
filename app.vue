@@ -1,31 +1,32 @@
 <script setup lang="ts">
 import { Runner } from './models/runner';
+import { Section } from './models/section';
 
 const selectedRunners = ref<Runner[]>([]);
-const startingTime = ref({ hours: 5, minutes: 0, label: '05:00' });
+const startingTime = ref('05:00');
 
-const sections = [
-  { id: 1, distance: 3.2, from: 'Rajt', to: 'Tiszaörvéy' },
-  { id: 2, distance: 11.2, from: 'Tiszaörvéy', to: 'Tiszaderzs' },
-  { id: 3, distance: 8.2, from: 'Tiszaderzs', to: 'Abádszalók' },
-  { id: 4, distance: 2.7, from: 'Abádszalók', to: 'Abádszalók kikötő' },
-  { id: 5, distance: 6.6, from: 'Abádszalók kikötő', to: 'Kisköre' },
-  { id: 6, distance: 5.7, from: 'Kisköre', to: 'Dinnyéshát' },
-  { id: 7, distance: 9.3, from: 'Dinnyéshát', to: 'Sarud' },
-  { id: 8, distance: 8.2, from: 'Sarud', to: 'Poroszló' },
-  { id: 9, distance: 9.9, from: 'Poroszló', to: 'Fordító' },
-  { id: 10, distance: 9.9, from: 'Fordító', to: 'Poroszló' },
-  { id: 11, distance: 8.2, from: 'Poroszló', to: 'Sarud' },
-  { id: 12, distance: 9.3, from: 'Sarud', to: 'Dinnyéshát' },
-  { id: 13, distance: 5.7, from: 'Dinnyéshát', to: 'Kisköre' },
-  { id: 14, distance: 6.6, from: 'Kisköre', to: 'Abádszalók kikötő' },
-  { id: 15, distance: 2.7, from: 'Abádszalók kikötő', to: 'Abádszalók' },
-  { id: 16, distance: 8.2, from: 'Abádszalók', to: 'Tiszaderzs' },
-  { id: 17, distance: 11.2, from: 'Tiszaderzs', to: 'Tiszaörvéy' },
-  { id: 18, distance: 3.2, from: 'Tiszaörvéy', to: 'Cél' }
+const sections: Section[] = [
+  new Section(1, 3.2, 'Rajt', 'Tiszaörvéy', startingTime.value),
+  new Section(2, 11.2, 'Tiszaörvéy', 'Tiszaderzs', startingTime.value),
+  new Section(3, 8.2, 'Tiszaderzs', 'Abádszalók', startingTime.value),
+  new Section(4, 2.7, 'Abádszalók', 'Abádszalók kikötő', startingTime.value),
+  new Section(5, 6.6, 'Abádszalók kikötő', 'Kisköre', startingTime.value),
+  new Section(6, 5.7, 'Kisköre', 'Dinnyéshát', startingTime.value),
+  new Section(7, 9.3, 'Dinnyéshát', 'Sarud', startingTime.value),
+  new Section(8, 8.2, 'Sarud', 'Poroszló', startingTime.value),
+  new Section(9, 9.9, 'Poroszló', 'Fordító', startingTime.value),
+  new Section(10, 9.9, 'Fordító', 'Poroszló', startingTime.value),
+  new Section(11, 8.2, 'Poroszló', 'Sarud', startingTime.value),
+  new Section(12, 9.3, 'Sarud', 'Dinnyéshát', startingTime.value),
+  new Section(13, 5.7, 'Dinnyéshát', 'Kisköre', startingTime.value),
+  new Section(14, 6.6, 'Kisköre', 'Abádszalók kikötő', startingTime.value),
+  new Section(15, 2.7, 'Abádszalók kikötő', 'Abádszalók', startingTime.value),
+  new Section(16, 8.2, 'Abádszalók', 'Tiszaderzs', startingTime.value),
+  new Section(17, 11.2, 'Tiszaderzs', 'Tiszaörvéy', startingTime.value),
+  new Section(18, 3.2, 'Tiszaörvéy', 'Cél', startingTime.value)
 ];
 
-const runners = [
+const runners: Runner[] = [
   new Runner('Runner 1', 5),
   new Runner('Runner 2', 6),
   new Runner('Runner 3', 7),
@@ -41,8 +42,7 @@ const runners = [
 const formattedTimes = Array.from({ length: 60 * 10 }, (_, i) => {
   const hours = Math.floor(i / 60) + 5;
   const minutes = i % 60;
-  const formatted = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-  return { label: formatted, value: { hours, minutes, label: formatted } };
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
 });
 
 </script>
@@ -52,7 +52,7 @@ const formattedTimes = Array.from({ length: 60 * 10 }, (_, i) => {
     <div>Rajtidőpont</div>
     <div>
       <select v-model="startingTime">
-        <option v-for="time in formattedTimes" :key="time.label" :value="time.value">{{ time.label }}</option>
+        <option v-for="time in formattedTimes" :key="time" :value="time">{{ time }}</option>
       </select>
     </div>
   </div>
@@ -79,81 +79,15 @@ const formattedTimes = Array.from({ length: 60 * 10 }, (_, i) => {
       </div>
     </div>
     <div class="flex flex-col">
-      <div class="flex w-14 h-8 px-2 font-bold items-center">
-        {{ selectedRunners[0]?.calculateElapsedTime(startingTime.label, sections[0].distance) }}
-      </div>
-      
-      <div class="flex w-14 h-8 px-2 font-bold items-center">
-        {{ selectedRunners[1]?.calculateElapsedTime(selectedRunners[0]?.calculateElapsedTime(startingTime.label, sections[0].distance), sections[1].distance) }}
-      </div>
-
-      <div class="flex w-14 h-8 px-2 font-bold items-center">
-        {{ selectedRunners[2]?.calculateElapsedTime(selectedRunners[1]?.calculateElapsedTime(startingTime.label, sections[0].distance), sections[1].distance) }}
-      </div>
-
-      <div class="flex w-14 h-8 px-2 font-bold items-center">
-        {{ selectedRunners[3]?.calculateElapsedTime(selectedRunners[2]?.calculateElapsedTime(startingTime.label, sections[0].distance), sections[1].distance) }}
-      </div>
-
-      <div class="flex w-14 h-8 px-2 font-bold items-center">
-        {{ selectedRunners[4]?.calculateElapsedTime(selectedRunners[3]?.calculateElapsedTime(startingTime.label, sections[0].distance), sections[1].distance) }}
-      </div>
-
-      <div class="flex w-14 h-8 px-2 font-bold items-center">
-        {{ selectedRunners[5]?.calculateElapsedTime(selectedRunners[4]?.calculateElapsedTime(startingTime.label, sections[0].distance), sections[1].distance) }}
-      </div>
-
-      <div class="flex w-14 h-8 px-2 font-bold items-center">
-        {{  startingTime }}
-        {{ selectedRunners[6]?.calculateElapsedTime(selectedRunners[5]?.calculateElapsedTime(startingTime.label, sections[0].distance), sections[1].distance) }}
-      </div>
-
-      <div class="flex w-14 h-8 px-2 font-bold items-center">
-        {{ selectedRunners[7]?.calculateElapsedTime(selectedRunners[6]?.calculateElapsedTime(startingTime.label, sections[0].distance), sections[1].distance) }}
-      </div>
-
-      <div class="flex w-14 h-8 px-2 font-bold items-center">
-        {{ selectedRunners[8]?.calculateElapsedTime(selectedRunners[7]?.calculateElapsedTime(startingTime.label, sections[0].distance), sections[1].distance) }}
-      </div>
-
-      <div class="flex w-14 h-8 px-2 font-bold items-center">
-        {{ selectedRunners[9]?.calculateElapsedTime(selectedRunners[8]?.calculateElapsedTime(startingTime.label, sections[0].distance), sections[1].distance) }}
-      </div>
-
-      <div class="flex w-14 h-8 px-2 font-bold items-center">
-        {{ selectedRunners[10]?.calculateElapsedTime(selectedRunners[9]?.calculateElapsedTime(startingTime.label, sections[0].distance), sections[1].distance) }}
-      </div>
-
-      <div class="flex w-14 h-8 px-2 font-bold items-center">
-        {{ selectedRunners[11]?.calculateElapsedTime(selectedRunners[10]?.calculateElapsedTime(startingTime.label, sections[0].distance), sections[1].distance) }}
-      </div>
-
-      <div class="flex w-14 h-8 px-2 font-bold items-center">
-        {{ selectedRunners[12]?.calculateElapsedTime(selectedRunners[11]?.calculateElapsedTime(startingTime.label, sections[0].distance), sections[1].distance) }}
-      </div>
-
-      <div class="flex w-14 h-8 px-2 font-bold items-center">
-        {{ selectedRunners[13]?.calculateElapsedTime(selectedRunners[12]?.calculateElapsedTime(startingTime.label, sections[0].distance), sections[1].distance) }}
-      </div>
-
-      <div class="flex w-14 h-8 px-2 font-bold items-center">
-        {{ selectedRunners[14]?.calculateElapsedTime(selectedRunners[13]?.calculateElapsedTime(startingTime.label, sections[0].distance), sections[1].distance) }}
-      </div>
-
-      <div class="flex w-14 h-8 px-2 font-bold items-center">
-        {{ selectedRunners[15]?.calculateElapsedTime(selectedRunners[14]?.calculateElapsedTime(startingTime.label, sections[0].distance), sections[1].distance) }}
-      </div>
-
-      <div class="flex w-14 h-8 px-2 font-bold items-center">
-        {{ selectedRunners[16]?.calculateElapsedTime(selectedRunners[15]?.calculateElapsedTime(startingTime.label, sections[0].distance), sections[1].distance) }}
-      </div>
-
-      <div class="flex w-14 h-8 px-2 font-bold items-center">
-        {{ selectedRunners[17]?.calculateElapsedTime(selectedRunners[16]?.calculateElapsedTime(startingTime.label, sections[0].distance), sections[1].distance) }}
-      </div>
-
-      <div class="flex w-14 h-8 px-2 font-bold items-center">
-        {{ selectedRunners[18]?.calculateElapsedTime(selectedRunners[17]?.calculateElapsedTime(startingTime.label, sections[0].distance), sections[1].distance) }}
+      <div class="flex w-14 h-8 px-2 font-bold items-center" v-for="(section, index) in sections" :key="section.id">
+        <div v-if="selectedRunners[index]">
+          <div v-if="index === 0">
+          {{ sections[0].calculateArrival(startingTime, selectedRunners[0]?.formattedTime(sections[0].distance)) }}
+        </div>
+        <div v-else>
+          {{ sections[index].calculateArrival(sections[index - 1]?.arrival, selectedRunners[index]?.formattedTime(sections[index].distance)) }}
+        </div>
+        </div>
       </div>
     </div>
   </div>
