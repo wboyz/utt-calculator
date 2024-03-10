@@ -1,3 +1,4 @@
+import { Duration } from "luxon";
 import type { Pace } from "./pace";
 
 export class Runner {
@@ -9,6 +10,7 @@ export class Runner {
     const hours = Math.floor(totalTimeInMinutes / 60);
     const minutes = Math.floor(totalTimeInMinutes % 60);
     const seconds = Math.floor(totalTimeInMinutes * 60 % 60);
-    return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+    return Duration.fromObject({ hours, minutes, seconds }).toFormat('hh:mm:ss');
   }
 }

@@ -1,3 +1,5 @@
+import { Duration } from "luxon";
+
 export class Section {
   constructor(
     public id: number,
@@ -16,7 +18,7 @@ export class Section {
     const minutes = Math.floor(totalMinutes % 60);
     const seconds = totalMinutes * 60 % 60;
 
-    this.arrival = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    this.arrival = Duration.fromObject({ hours, minutes, seconds }).toFormat('hh:mm:ss');
     return this.arrival;
   }
 }
