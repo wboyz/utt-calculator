@@ -1,4 +1,6 @@
 <script setup lang="ts">
+useHead({ bodyAttrs : { class: 'bg-gray-100'} })
+
 import { SimpleDuration } from './models/simple-duration';
 import { Runner } from './models/runner';
 import { Section } from './models/section';
@@ -65,20 +67,22 @@ function calculateDuration(time1: SimpleDuration, time2: SimpleDuration) {
   </div>
 
   <div class="flex flex-col">
-    <div v-for="(section, index) in sections" :key="section.id" class="flex gap-3 h-8"
-      :class="section.id % 2 === 0 ? 'bg-gray-200' : ''">
-      <div class="items-center text-lg font-bold w-8">{{ section.id }}.</div>
-      <div class="items-center text-lg w-64">{{ section.from }}</div>
-      <div class="items-center text-gray-500 w-64">{{ section.to }}</div>
+    <div v-for="(section, index) in sections" :key="section.id" class="flex gap-3 py-3"
+      :class="section.id % 2 === 0 ? 'bg-slate-200' : ''">
+      <div class="items-center font-bold w-8">{{ section.id }}.</div>
+      <div class="items-center w-64 bg-lime-400 p-1 rounded-md">{{ section.from }}</div>
+      <div class="items-center text-white w-64 bg-cyan-600 p-1 rounded-md">{{ section.to }}</div>
       <div class="items-center text-gray-500 w-20 font-bold">{{ section.distance }} km</div>
       <div class="items-center flex w-32">
-        <select v-model="selectedRunners[index]">
+        <select v-model="selectedRunners[index]" class="p-1 bg-white">
           <option v-for="runner in runners" :key="runner.name" :value="runner">{{ runner.name }}</option>
         </select>
       </div>
       <div class="items-center flex gap-3">
-        <input type="number" min="0" v-if="selectedRunners[index]" v-model="selectedRunners[index].pace.minutes" class="w-14" />
-        <input type="number" min="0" v-if="selectedRunners[index]" v-model="selectedRunners[index].pace.seconds" class="w-14" />
+        <input type="number" min="0" v-if="selectedRunners[index]" v-model="selectedRunners[index].pace.minutes"
+          class="w-14 p-1" />
+        <input type="number" min="0" v-if="selectedRunners[index]" v-model="selectedRunners[index].pace.seconds"
+          class="w-14 p-1" />
       </div>
       <div class="items-center flex">
         {{ selectedRunners[index]?.formattedTime(sections[index].distance) }}
@@ -88,18 +92,19 @@ function calculateDuration(time1: SimpleDuration, time2: SimpleDuration) {
           {{ sections[0].calculateArrival(startingTime, selectedRunners[0]?.formattedTime(sections[0].distance)) }}
         </div>
         <div v-else>
-          {{ sections[index].calculateArrival(sections[index - 1]?.arrival, selectedRunners[index]?.formattedTime(sections[index].distance)) }}
+          {{ sections[index].calculateArrival(sections[index - 1]?.arrival,
+        selectedRunners[index]?.formattedTime(sections[index].distance)) }}
         </div>
       </div>
     </div>
   </div>
 
   <div class="flex">
-    <div class="text-lg font-bold w-32">
+    <div class="font-bold w-32">
       Összesen
     </div>
-    <div class="text-lg font-bold w-32">
-      {{ calculateDuration(sections[sections.length - 1].arrival, startingTime) }} 
+    <div class="font-bold w-32">
+      {{ calculateDuration(sections[sections.length - 1].arrival, startingTime) }}
     </div>
   </div>
 
