@@ -13,9 +13,10 @@ export class Section {
 
     const totalMinutes = startingHours * 60 + startingMinutes + (runningHours * 60 + runningMinutes);
     const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
+    const minutes = Math.floor(totalMinutes % 60);
+    const seconds = totalMinutes * 60 % 60;
 
-    this.arrival = `${hours.toString().padStart(2, '0')}:${minutes.toFixed(2).padStart(2, '0')}`;
+    this.arrival = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     return this.arrival;
   }
 }

@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
+import { Pace } from './models/pace';
 import { Runner } from './models/runner';
 import { Section } from './models/section';
-
-dayjs.extend(duration);
+import { Duration } from "luxon";
 
 const selectedRunners = ref<Runner[]>([]);
 const startingTime = ref('05:00');
@@ -31,29 +29,28 @@ const sections: Section[] = [
 ];
 
 const runners: Runner[] = [
-  new Runner('Runner 1', 5),
-  new Runner('Runner 2', 6),
-  new Runner('Runner 3', 7),
-  new Runner('Runner 4', 5),
-  new Runner('Runner 5', 6),
-  new Runner('Runner 6', 7),
-  new Runner('Runner 7', 5),
-  new Runner('Runner 8', 6),
-  new Runner('Runner 9', 7),
-  new Runner('Runner 10', 5)
+  new Runner('Runner 1', new Pace(6, 30)),
+  new Runner('Runner 2', new Pace(7, 30)),
+  new Runner('Runner 3', new Pace(7, 15)),
+  new Runner('Runner 4', new Pace(5, 30)),
+  new Runner('Runner 5', new Pace(4, 30)),
+  new Runner('Runner 6', new Pace(6, 50)),
+  new Runner('Runner 7', new Pace(7, 0)),
+  new Runner('Runner 8', new Pace(7, 30)),
+  new Runner('Runner 9', new Pace(7, 10)),
+  new Runner('Runner 10', new Pace(6, 50))
 ];
 
 const formattedTimes = Array.from({ length: 60 * 10 }, (_, i) => {
-  const time = dayjs.duration(i, 'minutes').add(5, 'hours');
-  return time.format('HH:mm');
+  const time = Duration.fromObject({ minutes: i }).plus({ hours: 5 });
+  return time.toFormat('HH:mm');
 });
 
 function calculateDuration(time1: string = '00:00', time2: string = '00:00') {
-  const duration1 = dayjs.duration(time1);
-  const duration2 = dayjs.duration(time2);
-  const diffDuration = duration1.subtract(duration2);
+  const startTime = Duration.fromISO(time1);
+  const runningTime = Duration.fromISO(time2);
 
-  return diffDuration.format('HH:mm');
+  return startTime.plus(runningTime).toFormat('HH:mm');
 }
 
 </script>
@@ -80,10 +77,11 @@ function calculateDuration(time1: string = '00:00', time2: string = '00:00') {
           <option v-for="runner in runners" :key="runner.name" :value="runner">{{ runner.name }}</option>
         </select>
       </div>
-      <div class="items-center flex w-14">
-        <input type="number" v-if="selectedRunners[index]" v-model="selectedRunners[index].pace" class="w-14" />
+      <div class="items-center flex gap-3">
+        <input type="number" min="0" v-if="selectedRunners[index]" v-model="selectedRunners[index].pace.minutes" class="w-14" />
+        <input type="number" min="0" v-if="selectedRunners[index]" v-model="selectedRunners[index].pace.seconds" class="w-14" />
       </div>
-      <div class="items-center flex w-14">
+      <div class="items-center flex">
         {{ selectedRunners[index]?.formattedTime(sections[index].distance) }}
       </div>
       <div v-if="selectedRunners[index]" class="flex items-center">
@@ -106,4 +104,6 @@ function calculateDuration(time1: string = '00:00', time2: string = '00:00') {
     </div>
   </div>
 
-</template>
+</template>import dayjs from 'dayjs';
+import { Duration } from './models/duration';
+
