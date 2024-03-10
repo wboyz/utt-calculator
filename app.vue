@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { Pace } from './models/pace';
+import { SimpleDuration } from './models/simple-duration';
 import { Runner } from './models/runner';
 import { Section } from './models/section';
 import { Duration } from "luxon";
 
 const selectedRunners = ref<Runner[]>([]);
-const startingTime = ref('05:00');
+const startingTime = ref(new SimpleDuration(5, 0, 0));
 
 const sections: Section[] = [
   new Section(1, 3.2, 'Rajt', 'Tiszaörvéy', startingTime.value),
@@ -29,28 +29,27 @@ const sections: Section[] = [
 ];
 
 const runners: Runner[] = [
-  new Runner('Runner 1', new Pace(6, 30)),
-  new Runner('Runner 2', new Pace(7, 30)),
-  new Runner('Runner 3', new Pace(7, 15)),
-  new Runner('Runner 4', new Pace(5, 30)),
-  new Runner('Runner 5', new Pace(4, 30)),
-  new Runner('Runner 6', new Pace(6, 50)),
-  new Runner('Runner 7', new Pace(7, 0)),
-  new Runner('Runner 8', new Pace(7, 30)),
-  new Runner('Runner 9', new Pace(7, 10)),
-  new Runner('Runner 10', new Pace(6, 50))
+  new Runner('Runner 1', new SimpleDuration(0, 6, 30)),
+  new Runner('Runner 2', new SimpleDuration(0, 7, 30)),
+  new Runner('Runner 3', new SimpleDuration(0, 7, 15)),
+  new Runner('Runner 4', new SimpleDuration(0, 5, 30)),
+  new Runner('Runner 5', new SimpleDuration(0, 4, 30)),
+  new Runner('Runner 6', new SimpleDuration(0, 6, 50)),
+  new Runner('Runner 7', new SimpleDuration(0, 7, 0)),
+  new Runner('Runner 8', new SimpleDuration(0, 7, 30)),
+  new Runner('Runner 9', new SimpleDuration(0, 7, 10)),
+  new Runner('Runner 10', new SimpleDuration(0, 6, 50))
 ];
 
-const formattedTimes = Array.from({ length: 60 * 10 }, (_, i) => {
+const availableStartingTimes = Array.from({ length: 60 * 10 }, (_, i) => {
   const time = Duration.fromObject({ minutes: i }).plus({ hours: 5 });
-  return time.toFormat('HH:mm');
+  return { label: time.toFormat('hh:mm'), value: new SimpleDuration(time.hours, time.minutes, time.seconds) };
 });
 
-function calculateDuration(time1: string = '00:00', time2: string = '00:00') {
-  const startTime = Duration.fromISO(time1);
-  const runningTime = Duration.fromISO(time2);
-
-  return startTime.plus(runningTime).toFormat('HH:mm');
+function calculateDuration(time1: SimpleDuration, time2: SimpleDuration) {
+  const startTime = Duration.fromObject(time1);
+  const runningTime = Duration.fromObject(time2);
+  return startTime.minus(runningTime).toFormat('hh:mm:ss');
 }
 
 </script>
@@ -60,7 +59,7 @@ function calculateDuration(time1: string = '00:00', time2: string = '00:00') {
     <div>Rajtidőpont</div>
     <div>
       <select v-model="startingTime">
-        <option v-for="time in formattedTimes" :key="time" :value="time">{{ time }}</option>
+        <option v-for="time in availableStartingTimes" :key="time.label" :value="time.value">{{ time.label }}</option>
       </select>
     </div>
   </div>
@@ -104,6 +103,4 @@ function calculateDuration(time1: string = '00:00', time2: string = '00:00') {
     </div>
   </div>
 
-</template>import dayjs from 'dayjs';
-import { Duration } from './models/duration';
-
+</template>

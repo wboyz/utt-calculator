@@ -1,4 +1,5 @@
 import { Duration } from "luxon";
+import { SimpleDuration } from "./simple-duration";
 
 export class Section {
   constructor(
@@ -6,19 +7,18 @@ export class Section {
     public distance: number,
     public from: string,
     public to: string,
-    public arrival: string
+    public arrival: SimpleDuration
   ) { }
 
-  public calculateArrival(startingTime: string, runningTime: string = '00:00'): string {
-    const [startingHours, startingMinutes] = startingTime.split(':').map(Number);
+  public calculateArrival(startingTime: SimpleDuration, runningTime: string = '00:00'): string {
     const [runningHours, runningMinutes] = runningTime.split(':').map(Number);
 
-    const totalMinutes = startingHours * 60 + startingMinutes + (runningHours * 60 + runningMinutes);
+    const totalMinutes = startingTime.hours * 60 + startingTime.minutes + (runningHours * 60 + runningMinutes);
     const hours = Math.floor(totalMinutes / 60);
     const minutes = Math.floor(totalMinutes % 60);
     const seconds = totalMinutes * 60 % 60;
 
-    this.arrival = Duration.fromObject({ hours, minutes, seconds }).toFormat('hh:mm:ss');
-    return this.arrival;
+    this.arrival = new SimpleDuration(hours, minutes, seconds);
+    return Duration.fromObject(this.arrival).toFormat('hh:mm:ss');
   }
 }
