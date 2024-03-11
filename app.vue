@@ -1,47 +1,21 @@
 <script setup lang="ts">
-useHead({ bodyAttrs: { class: 'bg-base-100', }, htmlAttrs: { lang: 'hu', 'data-theme': 'fantasy' } });
-
 import { SimpleDuration } from './models/simple-duration';
 import { Runner } from './models/runner';
 import { Section } from './models/section';
 import { Duration } from "luxon";
+import initData from './data/init';
+import { Sections } from './data/sections';
+import { Runners } from './data/runners';
 
-const selectedRunners = ref<Runner[]>([]);
+useHead({ bodyAttrs: { class: 'bg-base-100', }, htmlAttrs: { lang: 'hu', 'data-theme': 'fantasy' } });
+
 const startingTime = ref(new SimpleDuration(5, 0, 0));
 
-const sections: Section[] = [
-  new Section(1, 3.2, 'Rajt', 'Tiszaörvéy', startingTime.value),
-  new Section(2, 11.2, 'Tiszaörvéy', 'Tiszaderzs', startingTime.value),
-  new Section(3, 8.2, 'Tiszaderzs', 'Abádszalók', startingTime.value),
-  new Section(4, 2.7, 'Abádszalók', 'Abádszalók kikötő', startingTime.value),
-  new Section(5, 6.6, 'Abádszalók kikötő', 'Kisköre', startingTime.value),
-  new Section(6, 5.7, 'Kisköre', 'Dinnyéshát', startingTime.value),
-  new Section(7, 9.3, 'Dinnyéshát', 'Sarud', startingTime.value),
-  new Section(8, 8.2, 'Sarud', 'Poroszló', startingTime.value),
-  new Section(9, 9.9, 'Poroszló', 'Fordító', startingTime.value),
-  new Section(10, 9.9, 'Fordító', 'Poroszló', startingTime.value),
-  new Section(11, 8.2, 'Poroszló', 'Sarud', startingTime.value),
-  new Section(12, 9.3, 'Sarud', 'Dinnyéshát', startingTime.value),
-  new Section(13, 5.7, 'Dinnyéshát', 'Kisköre', startingTime.value),
-  new Section(14, 6.6, 'Kisköre', 'Abádszalók kikötő', startingTime.value),
-  new Section(15, 2.7, 'Abádszalók kikötő', 'Abádszalók', startingTime.value),
-  new Section(16, 8.2, 'Abádszalók', 'Tiszaderzs', startingTime.value),
-  new Section(17, 11.2, 'Tiszaderzs', 'Tiszaörvéy', startingTime.value),
-  new Section(18, 3.2, 'Tiszaörvéy', 'Cél', startingTime.value)
-];
+const sections = ref(Sections.all());
 
-const runners: Runner[] = [
-  new Runner('Runner 1', new SimpleDuration(0, 6, 30)),
-  new Runner('Runner 2', new SimpleDuration(0, 7, 30)),
-  new Runner('Runner 3', new SimpleDuration(0, 7, 15)),
-  new Runner('Runner 4', new SimpleDuration(0, 5, 30)),
-  new Runner('Runner 5', new SimpleDuration(0, 4, 30)),
-  new Runner('Runner 6', new SimpleDuration(0, 6, 50)),
-  new Runner('Runner 7', new SimpleDuration(0, 7, 0)),
-  new Runner('Runner 8', new SimpleDuration(0, 7, 30)),
-  new Runner('Runner 9', new SimpleDuration(0, 7, 10)),
-  new Runner('Runner 10', new SimpleDuration(0, 6, 50))
-];
+initData(startingTime.value, sections.value);
+
+const runners: Runner[] = Runners.all();
 
 const availableStartingTimes = Array.from({ length: 60 * 10 }, (_, i) => {
   const time = Duration.fromObject({ minutes: i }).plus({ hours: 5 });
@@ -55,7 +29,7 @@ function calculateDuration(time1: SimpleDuration, time2: SimpleDuration) {
 }
 
 const percent = computed(() => {
-  return Math.floor((selectedRunners.value.filter(Boolean).length / sections.length) * 100);
+  return Math.floor((Sections.getAssignedSections().length / sections.value.length) * 100);
 });
 </script>
 
@@ -71,34 +45,28 @@ const percent = computed(() => {
     </div>
 
     <div class="flex flex-col">
-      <div v-for="(section, index) in sections" :key="section.id" class="flex gap-3 py-2"
+      <div v-for="section in sections" :key="section.id" class="flex gap-3 py-2"
         :class="section.id % 2 === 0 ? 'bg-base-200' : ''">
         <div class="flex items-center font-bold w-8 px-2">{{ section.id }}.</div>
         <div class="flex items-center w-64 text-white bg-secondary p-1 rounded-md">{{ section.from }}</div>
         <div class="flex items-center w-64 bg-accent p-1 rounded-md">{{ section.to }}</div>
         <div class="flex items-center text-gray-500 w-20 font-bold">{{ section.distance }} km</div>
         <div class="items-center flex">
-          <select v-model="selectedRunners[index]" class="select select-sm select-bordered w-full max-w-xs">
-            <option v-for="runner in runners" :key="runner.name" :value="runner">{{ runner.name }}</option>
+          <select v-model="section.runnerIndex" class="select select-sm select-bordered w-full max-w-xs">
+            <option v-for="(runner, runnerIndex) in runners" :key="runner.name" :value="runnerIndex">{{ runner.name }}</option>
           </select>
         </div>
         <div class="items-center flex gap-3">
-          <input type="number" min="0" v-if="selectedRunners[index]" v-model="selectedRunners[index].pace.minutes"
+          <input type="number" min="0" v-if="section.runner" v-model="section.runner.pace.minutes"
             class="w-20 input input-sm input-bordered max-w-xs" />
-          <input type="number" min="0" v-if="selectedRunners[index]" v-model="selectedRunners[index].pace.seconds"
+          <input type="number" min="0" v-if="section.runner" v-model="section.runner.pace.seconds"
             class="w-20 input input-sm input-bordered max-w-xs" />
         </div>
         <div class="items-center flex">
-          {{ selectedRunners[index]?.formattedTime(sections[index].distance) }}
+          {{ section.runner?.formattedTime(section.distance) }}
         </div>
-        <div v-if="selectedRunners[index]" class="flex items-center">
-          <div v-if="index === 0">
-            {{ sections[0].calculateArrival(startingTime, selectedRunners[0]?.formattedTime(sections[0].distance)) }}
-          </div>
-          <div v-else>
-            {{ sections[index].calculateArrival(sections[index - 1]?.arrival,
-        selectedRunners[index]?.formattedTime(sections[index].distance)) }}
-          </div>
+        <div v-if="section.runner" class="flex items-center">
+          {{ section.arrivalAsString }}
         </div>
       </div>
     </div>
@@ -115,7 +83,7 @@ const percent = computed(() => {
 
           </div>
           <div class="stat-title">Total Distance</div>
-          <div class="stat-value text-primary">130 KM</div>
+          <div class="stat-value text-primary">{{ Sections.getSumOfDistances() }} KM</div>
         </div>
 
         <div class="stat">
