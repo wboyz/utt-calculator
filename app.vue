@@ -66,8 +66,8 @@ const percent = computed(() => {
         <h1 class="text-lg font-bold">Rajtidőpont</h1>
       </label>
       <select v-model="startingTime" class="select select-bordered max-w-xs w-24" id="starting_time">
-          <option v-for="time in availableStartingTimes" :key="time.label" :value="time.value">{{ time.label }}</option>
-        </select>
+        <option v-for="time in availableStartingTimes" :key="time.label" :value="time.value">{{ time.label }}</option>
+      </select>
     </div>
 
     <div class="flex flex-col">
@@ -97,7 +97,7 @@ const percent = computed(() => {
           </div>
           <div v-else>
             {{ sections[index].calculateArrival(sections[index - 1]?.arrival,
-          selectedRunners[index]?.formattedTime(sections[index].distance)) }}
+        selectedRunners[index]?.formattedTime(sections[index].distance)) }}
           </div>
         </div>
       </div>
@@ -129,7 +129,7 @@ const percent = computed(() => {
           </div>
           <div class="stat-title">Total Time</div>
           <div class="stat-value text-secondary">{{ calculateDuration(sections[sections.length - 1].arrival,
-          startingTime) }}</div>
+        startingTime) }}</div>
         </div>
 
         <div class="stat">
