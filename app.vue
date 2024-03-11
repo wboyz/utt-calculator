@@ -54,6 +54,13 @@ function calculateDuration(time1: SimpleDuration, time2: SimpleDuration) {
   return startTime.minus(runningTime).toFormat('hh:mm:ss');
 }
 
+function validateSeconds(event: Event) {
+  const target = event.target as HTMLInputElement;
+  if (target.valueAsNumber > 60) {
+    target.value = '60';
+  }
+}
+
 </script>
 
 <template>
@@ -81,7 +88,7 @@ function calculateDuration(time1: SimpleDuration, time2: SimpleDuration) {
       <div class="items-center flex gap-3">
         <input type="number" min="0" v-if="selectedRunners[index]" v-model="selectedRunners[index].pace.minutes"
           class="w-14 p-1" />
-        <input type="number" min="0" v-if="selectedRunners[index]" v-model="selectedRunners[index].pace.seconds"
+        <input type="number" min="0" max="60" v-if="selectedRunners[index]" @change="validateSeconds" v-model="selectedRunners[index].pace.seconds"
           class="w-14 p-1" />
       </div>
       <div class="items-center flex">
