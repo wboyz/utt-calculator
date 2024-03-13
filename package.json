@@ -19,5 +19,6 @@
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.11.4",
     "@types/luxon": "^3.4.2"
-  }
+  },
+  "packageManager": "yarn@4.1.1"
 }
