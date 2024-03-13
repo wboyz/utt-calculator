@@ -115,7 +115,7 @@ const percent = computed(() => {
       </div>
     </div>
 
-    <div class="stats shadow mt-3">
+    <div class="stats stats-vertical lg:stats-horizontal shadow mt-3">
       <div class="stat">
         <div class="stat-figure text-primary">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
