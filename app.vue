@@ -65,13 +65,13 @@ const availableStartingTimes = Array.from({ length: 60 * 10 }, (_, i) => {
         </div>
         <div class="items-center flex">
           <select
-            v-model="section.runnerIndex"
+            v-model="section.runner"
             class="select select-sm select-bordered w-full max-w-xs"
           >
             <option
               v-for="(runner, runnerIndex) in runners"
-              :key="runner.name"
-              :value="runnerIndex"
+              :key="runnerIndex"
+              :value="runner"
             >
               {{ runner.name }}
             </option>
@@ -97,7 +97,7 @@ const availableStartingTimes = Array.from({ length: 60 * 10 }, (_, i) => {
           {{ section.runner?.formattedTime(section.distance) }}
         </div>
         <div v-if="section.runner" class="flex items-center">
-          {{ section.arrivalAsString }}
+          {{ section.arrivalAsString() }}
         </div>
       </div>
     </div>
