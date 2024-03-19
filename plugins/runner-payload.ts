@@ -6,6 +6,6 @@ export default definePayloadPlugin((nuxtApp) => {
   })
   definePayloadReviver('Runner', (value) => {
     const parsed = JSON.parse(value);
-    return new Runner(parsed.name, parsed.speed)
+    return new Runner(parsed.name, parsed.pace)
   })
 })
