@@ -5,6 +5,7 @@ export default definePayloadPlugin((nuxtApp) => {
     return value instanceof Runner && JSON.stringify(value)
   })
   definePayloadReviver('Runner', (value) => {
-    return new Runner(value.name, value.speed)
+    const parsed = JSON.parse(value);
+    return new Runner(parsed.name, parsed.speed)
   })
 })

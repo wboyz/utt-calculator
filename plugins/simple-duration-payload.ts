@@ -5,6 +5,7 @@ export default definePayloadPlugin((nuxtApp) => {
     return value instanceof SimpleDuration && JSON.stringify(value)
   })
   definePayloadReviver('SimpleDuration', (value) => {
-    return new SimpleDuration(value.hours, value.minutes, value.seconds)
+    const parsed = JSON.parse(value);
+    return new SimpleDuration(parsed.hours, parsed.minutes, parsed.seconds)
   })
 })
