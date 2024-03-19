@@ -31,7 +31,6 @@ export const useSectionsStore = defineStore("sections", () => {
     }
   });
 
-
   function completenessPercent() {
     const filledSectionCount = sections.value.filter(
       (section) => section.runner !== null
@@ -44,12 +43,9 @@ export const useSectionsStore = defineStore("sections", () => {
   }
 
   function totalDuration() {
-    console.log(sections.value);
-    console.log(sections.value[sections.value.length - 1]);
-
     const time1 = Duration.fromObject(sections.value[sections.value.length - 1].arrival());
     const time2 = startTime.value;
-    return Duration.fromObject(time1)
+    return time1
       .minus(Duration.fromObject(time2))
       .toFormat("hh:mm:ss");
   }
