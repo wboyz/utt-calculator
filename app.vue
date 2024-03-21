@@ -30,18 +30,7 @@ const sections: Section[] = [
   new Section(18, 3.2, 'Tiszaörvéy', 'Cél', startingTime.value)
 ];
 
-const runners: Runner[] = [
-  new Runner('Runner 1', new SimpleDuration(0, 6, 30)),
-  new Runner('Runner 2', new SimpleDuration(0, 7, 30)),
-  new Runner('Runner 3', new SimpleDuration(0, 7, 15)),
-  new Runner('Runner 4', new SimpleDuration(0, 5, 30)),
-  new Runner('Runner 5', new SimpleDuration(0, 4, 30)),
-  new Runner('Runner 6', new SimpleDuration(0, 6, 50)),
-  new Runner('Runner 7', new SimpleDuration(0, 7, 0)),
-  new Runner('Runner 8', new SimpleDuration(0, 7, 30)),
-  new Runner('Runner 9', new SimpleDuration(0, 7, 10)),
-  new Runner('Runner 10', new SimpleDuration(0, 6, 50))
-];
+const { runners } = useRunner();
 
 const availableStartingTimes = Array.from({ length: 60 * 10 }, (_, i) => {
   const time = Duration.fromObject({ minutes: i }).plus({ hours: 5 });
